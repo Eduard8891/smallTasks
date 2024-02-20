@@ -1,36 +1,46 @@
 package multithreading;
 
 
+import java.util.concurrent.Semaphore;
+
 public class Foo implements Runnable {
+    private int count = 0;
+    private final Semaphore semaphore = new Semaphore(1);
 
     public void first() throws InterruptedException {
-        syncMethod("first");
+        if (count == 0) {
+            semaphore.acquire();
+            try {
+                System.out.println("first");
+                count++;
+            } finally {
+                semaphore.release();
+            }
+        }
     }
 
     public void second() throws InterruptedException {
-        syncMethod("second");
+        if (count == 1) {
+            semaphore.acquire();
+            try {
+                System.out.println("second");
+                count++;
+            } finally {
+                semaphore.release();
+            }
+        } else second();
     }
 
     public void third() throws InterruptedException {
-        syncMethod("third");
-    }
-
-    public synchronized void syncMethod(String thread) throws InterruptedException {
-        if (thread.equals("first")) {
-            System.out.println(thread);
-            notifyAll();
-        } else
-            switch (thread) {
-                case "second": {
-                    wait();
-                    System.out.println(thread);
-                    notifyAll();
-                }
-                case "third": {
-                    wait();
-                    System.out.println(thread);
-                }
+        if (count == 2) {
+            semaphore.acquire();
+            try {
+                System.out.println("third");
+                count = 0;
+            } finally {
+                semaphore.release();
             }
+        } else third();
     }
 
     @Override
