@@ -2,10 +2,11 @@ package multithreading;
 
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Foo foo = new Foo();
         CompletableFuture.runAsync(() -> {
             try {
@@ -14,7 +15,7 @@ public class Main {
                 exception.printStackTrace();
             }
         });
-        CompletableFuture<Void> third = CompletableFuture.runAsync(() -> {
+        CompletableFuture.runAsync(() -> {
             try {
                 foo.third();
             } catch (InterruptedException exception) {
@@ -28,7 +29,7 @@ public class Main {
                 exception.printStackTrace();
             }
         });
-        third.join();
+        Thread.sleep(1000);
     }
 }
 
